@@ -1,0 +1,178 @@
+openapi: 3.0.1
+info:
+  title: Charles O'Clock REST API
+  description: Clock-in and clock-out
+  version: 1.0.0
+paths:
+  /clients/{id}/tags:
+    post:
+      summary: Claim tags for a client
+      description: claim
+      operationId: claim
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+    delete:
+      summary: Disclaim tags for a client
+      description: disclaim
+      operationId: disclaim
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+  /tags/{id}:
+    put:
+      summary: Clock in or clock out
+      description: in
+      operationId: clock
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClockStatus'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClockStatus'
+  /tags:
+    post:
+      summary: Provision new tags
+      operationId: createTag
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+  /clients:
+    post:
+      summary: Register a client
+      description: register
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneNumber'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientCredentials'
+components:
+  schemas:
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+        keypair:
+          type: object
+          properties:
+            public:
+              type: object
+              properties:
+                encoded:
+                  type: array
+                  items:
+                    type: string
+                    format: byte
+                format:
+                  type: string
+                algorithm:
+                  type: string
+            private:
+              type: object
+              properties:
+                encoded:
+                  type: array
+                  items:
+                    type: string
+                    format: byte
+                format:
+                  type: string
+                algorithm:
+                  type: string
+                destroyed:
+                  type: boolean
+        registered:
+          type: string
+          format: date-time
+        confirmed:
+          type: string
+          format: date-time
+      description: Charles O'Clock client
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        client:
+          $ref: '#/components/schemas/Client'
+    ClockStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        action:
+          type: string
+          enum:
+          - CLOCK_IN
+          - CLOCK_OUT
+        client:
+          $ref: '#/components/schemas/Client'
+      description: Clock status
+    ClientCredentials:
+      type: object
+      properties:
+        id:
+          type: string
+        secret:
+          type: object
+          properties:
+            encoded:
+              type: array
+              items:
+                type: string
+                format: byte
+            format:
+              type: string
+            algorithm:
+              type: string
+            destroyed:
+              type: boolean
+      description: Client credentials
+    PhoneNumber:
+      type: object
+      properties:
+        number:
+          type: string
+      description: Phone number
