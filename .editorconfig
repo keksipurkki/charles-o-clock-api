@@ -6,7 +6,10 @@ root = true
 [*]
 max_line_length = 80
 indent_style = space
-indent_size = 2
+indent_size = 4
+
+[*.xml]
+max_line_length = off
 
 [Makefile]
 indent_style = tab

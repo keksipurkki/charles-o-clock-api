@@ -8,7 +8,7 @@ paths:
     post:
       summary: Claim tags for a client
       description: claim
-      operationId: claim
+      operationId: CLAIM_TAG
       requestBody:
         content:
           application/json:
@@ -24,7 +24,7 @@ paths:
     delete:
       summary: Disclaim tags for a client
       description: disclaim
-      operationId: disclaim
+      operationId: DISCLAIM_TAG
       requestBody:
         content:
           application/json:
@@ -41,7 +41,7 @@ paths:
     put:
       summary: Clock in or clock out
       description: in
-      operationId: clock
+      operationId: CLOCK
       requestBody:
         content:
           application/json:
@@ -57,7 +57,7 @@ paths:
   /tags:
     post:
       summary: Provision new tags
-      operationId: createTag
+      operationId: CREATE_TAG
       responses:
         default:
           description: default response
@@ -65,11 +65,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tag'
+  /clients/{uuid}:
+    get:
+      summary: Get client details
+      description: client
+      operationId: GET_CLIENT
+      parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
   /clients:
     post:
       summary: Register a client
       description: register
-      operationId: register
+      operationId: REGISTER_CLIENT
       requestBody:
         content:
           application/json:
@@ -171,8 +190,10 @@ components:
               type: boolean
       description: Client credentials
     PhoneNumber:
+      required:
+      - phoneNumber
       type: object
       properties:
-        number:
+        phoneNumber:
           type: string
       description: Phone number

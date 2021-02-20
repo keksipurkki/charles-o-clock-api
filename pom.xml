@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>net.keksipurkki</groupId>
@@ -12,12 +12,14 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <main.class>net.keksipurkki.Main</main.class>
+    <main.class>net.keksipurkki.charles_o_clock.Main</main.class>
     <maven.compiler.source>15</maven.compiler.source>
     <maven.compiler.target>15</maven.compiler.target>
     <logback.contrib.version>0.1.5</logback.contrib.version>
     <jackson.version>2.12.1</jackson.version>
     <vertx.version>4.0.2</vertx.version>
+    <junit.version>5.7.1</junit.version>
+    <swagger.version>2.1.7</swagger.version>
   </properties>
 
   <dependencies>
@@ -38,6 +40,12 @@
       <artifactId>vertx-web-openapi</artifactId>
       <version>${vertx.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-junit5</artifactId>
+      <version>${vertx.version}</version>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Crypto -->
     <dependency>
@@ -51,12 +59,12 @@
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
       <artifactId>swagger-annotations</artifactId>
-      <version>2.1.6</version>
+      <version>${swagger.version}</version>
     </dependency>
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
       <artifactId>swagger-jaxrs2</artifactId>
-      <version>2.1.6</version>
+      <version>${swagger.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
@@ -105,8 +113,14 @@
     <!-- Testing -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.7.1</version>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <version>4.3.3</version>
       <scope>test</scope>
     </dependency>
 
@@ -120,82 +134,97 @@
   </dependencies>
 
   <build>
-      <finalName>app</finalName>
-      <plugins>
+    <finalName>app</finalName>
+    <plugins>
 
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>3.1.0</version>
-        </plugin>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.1.0</version>
+      </plugin>
 
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.0.2</version>
-        </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.2</version>
+      </plugin>
 
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.8.0</version>
-        </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+      </plugin>
 
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.1</version>
-        </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
 
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>3.2.4</version>
-          <configuration>
-            <transformers>
-              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                <mainClass>{main.class}</mainClass>
-              </transformer>
-            </transformers>
-            <createDependencyReducedPom>false</createDependencyReducedPom>
-          </configuration>
-          <executions>
-            <execution>
-              <phase>package</phase>
-              <goals>
-                <goal>shade</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
-        <plugin>
-          <groupId>io.swagger.core.v3</groupId>
-          <artifactId>swagger-maven-plugin</artifactId>
-          <version>2.1.6</version>
-          <configuration>
-            <outputFileName>api</outputFileName>
-            <outputPath>${project.basedir}/src/main/resources</outputPath>
-            <outputFormat>YAML</outputFormat>
-            <resourcePackages>
-              <package>net.keksipurkki.api</package>
-            </resourcePackages>
-            <modelConverterClasses>net.keksipurkki.support.FutureValueConverter</modelConverterClasses>
-            <prettyPrint>true</prettyPrint>
-          </configuration>
-          <executions>
-            <execution>
-              <phase>compile</phase>
-              <goals>
-                <goal>resolve</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <configuration>
-                  <source>15</source>
-                  <target>15</target>
-              </configuration>
-          </plugin>
-      </plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <configuration>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <mainClass>{main.class}</mainClass>
+            </transformer>
+          </transformers>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-maven-plugin</artifactId>
+        <version>${swagger.version}</version>
+        <configuration>
+          <outputFileName>api</outputFileName>
+          <outputPath>${project.basedir}/src/main/resources</outputPath>
+          <outputFormat>YAML</outputFormat>
+          <resourcePackages>
+            <package>net.keksipurkki.charles_o_clock.api</package>
+            <package>net.keksipurkki.charles_o_clock.domain</package>
+            <package>net.keksipurkki.charles_o_clock.exception</package>
+          </resourcePackages>
+          <modelConverterClasses>net.keksipurkki.charles_o_clock.support.FutureValueConverter</modelConverterClasses>
+          <prettyPrint>true</prettyPrint>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>resolve</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>
