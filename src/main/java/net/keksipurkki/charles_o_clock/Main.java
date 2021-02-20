@@ -3,6 +3,7 @@ package net.keksipurkki.charles_o_clock;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import net.keksipurkki.charles_o_clock.audit.AuditVerticle;
 import net.keksipurkki.charles_o_clock.http.HttpVerticle;
 import org.slf4j.Logger;
@@ -16,7 +17,10 @@ public class Main {
 
         logger.info("Starting {}", Main.class.getName());
 
-        var vertx = Vertx.vertx();
+        var opts = new VertxOptions()
+            .setWarningExceptionTime(5000);
+
+        var vertx = Vertx.vertx(opts);
         var httpVerticle = new HttpVerticle();
         var auditVerticle = new AuditVerticle();
 
