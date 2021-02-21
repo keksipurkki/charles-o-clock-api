@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -51,7 +50,7 @@ class SmokeIT {
     @Test
     @DisplayName("Too long path maps to 414 Request-URI Too Long")
     public void server_given_too_long_uri_then_shortcircuit_to_414(VertxTestContext ctx) {
-        var path = String.format("/tags/%s", "A".repeat(4096));
+        var path = String.format("/users/%s", "A".repeat(4096));
         given()
             .when().get(path)
             .then()
@@ -85,7 +84,7 @@ class SmokeIT {
             .when()
             .header("Content-Type", "application/json")
             .body(body.encode())
-            .post("/clients")
+            .post("/users")
             .then()
             .log().all()
             .assertThat()
@@ -96,10 +95,10 @@ class SmokeIT {
     @Test
     @DisplayName("Malformed path parameter is a 400 Bad Request")
     public void server_given_malformed_uuid_then_bad_request(VertxTestContext ctx) {
-        var malicious = "A".repeat(37);
+        var malformed = "A".repeat(37);
         given()
             .log().parameters()
-            .when().get(String.format("/clients/%s", malicious))
+            .when().get(String.format("/users/%s", malformed))
             .then()
             .log().all()
             .assertThat()
@@ -112,7 +111,7 @@ class SmokeIT {
     public void server_given_some_random_uuid_then_not_found(VertxTestContext ctx) {
         var random = UUID.randomUUID();
         given()
-            .when().get(String.format("/clients/%s", random))
+            .when().get(String.format("/users/%s", random))
             .then()
             .log().all()
             .assertThat()
@@ -131,7 +130,7 @@ class SmokeIT {
             .when()
             .header("Content-Type", "application/json")
             .body(body.encode())
-            .post("/clients")
+            .post("/users")
             .then()
             .log().all()
             .assertThat()
@@ -148,7 +147,7 @@ class SmokeIT {
             .when()
             .header("Content-Type", "application/json")
             .body(body)
-            .post("/clients")
+            .post("/users")
             .then()
             .log().all()
             .assertThat()
@@ -185,6 +184,5 @@ class SmokeIT {
     public void server_given_request_with_id_then_copied_to_response() {
         fail();
     }
-
 
 }

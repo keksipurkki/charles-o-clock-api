@@ -1,6 +1,7 @@
 package net.keksipurkki.charles_o_clock.exception;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.vertx.core.json.JsonObject;
 
 public abstract class ApiException extends RuntimeException {
@@ -20,8 +21,8 @@ public abstract class ApiException extends RuntimeException {
         this.code = status;
     }
 
-    @JsonCreator
-    private JsonObject toJson() {
+    @JsonValue
+    protected JsonObject toJson() {
         return new JsonObject().put("statusCode", code);
     }
 

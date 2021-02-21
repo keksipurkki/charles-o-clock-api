@@ -20,6 +20,7 @@ public class JsonFactory implements io.vertx.core.spi.JsonFactory {
         return new io.vertx.core.json.jackson.DatabindCodec();
     }
 
+    // Controls the SPI load order
     int order() {
         return 0;
     }

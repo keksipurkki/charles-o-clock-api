@@ -14,8 +14,7 @@ import static java.util.Objects.nonNull;
 
 public class Middlewares {
 
-    private static final Logger logger = LoggerFactory
-        .getLogger(Middlewares.class);
+    private static final Logger logger = LoggerFactory.getLogger(Middlewares.class);
 
     public static BodyHandler bodyHandler() {
         return BodyHandler.create().setBodyLimit(4096L);
@@ -25,7 +24,6 @@ public class Middlewares {
         return rc -> {
             final var message = "No route for "+rc.request().uri();
             rc.fail(new NotFoundException(message));
-            rc.next();
         };
     }
 

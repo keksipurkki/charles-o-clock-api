@@ -31,7 +31,7 @@ public class FutureValueSupport implements ModelConverter {
     }
 
     @Override
-    public Schema resolve(AnnotatedType type, ModelConverterContext context, Iterator<ModelConverter> chain) {
+    public Schema<?> resolve(AnnotatedType type, ModelConverterContext context, Iterator<ModelConverter> chain) {
         return Optional.ofNullable(chain.next())
                        .map(c -> c.resolve(futureValue(type).orElse(type), context, chain))
                        .orElse(null);

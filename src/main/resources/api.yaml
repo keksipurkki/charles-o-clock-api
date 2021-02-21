@@ -4,72 +4,26 @@ info:
   description: Clock-in and clock-out
   version: 1.0.0
 paths:
-  /clients/{id}/tags:
+  /users/{uuid}/tags:
     post:
-      summary: Claim tags for a client
-      description: claim
-      operationId: CLAIM_TAG
+      operationId: ADD_TAG
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Client'
+              $ref: '#/components/schemas/User'
       responses:
         default:
           description: default response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
-    delete:
-      summary: Disclaim tags for a client
-      description: disclaim
-      operationId: DISCLAIM_TAG
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Client'
-      responses:
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tag'
-  /tags/{id}:
-    put:
-      summary: Clock in or clock out
-      description: in
-      operationId: CLOCK
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ClockStatus'
-      responses:
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClockStatus'
-  /tags:
-    post:
-      summary: Provision new tags
-      operationId: CREATE_TAG
-      responses:
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tag'
-  /clients/{uuid}:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+  /users/{uuid}:
     get:
-      summary: Get client details
-      description: client
-      operationId: GET_CLIENT
+      operationId: GET_USER_BY_ID
       parameters:
       - name: uuid
         in: path
@@ -83,12 +37,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Client'
-  /clients:
+                $ref: '#/components/schemas/User'
+  /users:
     post:
-      summary: Register a client
-      description: register
-      operationId: REGISTER_CLIENT
+      operationId: REGISTER
       requestBody:
         content:
           application/json:
@@ -100,84 +52,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientCredentials'
+                $ref: '#/components/schemas/User'
 components:
   schemas:
-    Client:
-      type: object
-      properties:
-        id:
-          type: string
-        keyPair:
-          type: object
-          properties:
-            public:
-              type: object
-              properties:
-                encoded:
-                  type: array
-                  items:
-                    type: string
-                    format: byte
-                format:
-                  type: string
-                algorithm:
-                  type: string
-            private:
-              type: object
-              properties:
-                encoded:
-                  type: array
-                  items:
-                    type: string
-                    format: byte
-                format:
-                  type: string
-                algorithm:
-                  type: string
-                destroyed:
-                  type: boolean
-        registered:
-          type: string
-          format: date-time
-        confirmed:
-          type: string
-          format: date-time
-      description: Charles O'Clock client
     Tag:
       type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        client:
-          $ref: '#/components/schemas/Client'
-    ClockStatus:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        timestamp:
-          type: string
-          format: date-time
-        action:
-          type: string
-          enum:
-          - CLOCK_IN
-          - CLOCK_OUT
-        client:
-          $ref: '#/components/schemas/Client'
-      description: Clock status
-    ClientCredentials:
-      type: object
-      properties:
-        id:
-          type: string
-      description: Client credentials
+      description: Tag
     PhoneNumber:
+      required:
+      - phoneNumber
       type: object
       properties:
         phoneNumber:
           type: string
       description: Phone number
+    User:
+      required:
+      - phoneNumber
+      type: object
+      properties:
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+      description: User

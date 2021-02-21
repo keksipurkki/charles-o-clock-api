@@ -1,10 +1,13 @@
 package net.keksipurkki.charles_o_clock.json;
 
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.validation.RequestParameters;
+import net.keksipurkki.charles_o_clock.domain.Violation;
 import net.keksipurkki.charles_o_clock.exception.InvalidInputException;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.util.Objects;
@@ -27,6 +30,10 @@ public class JsonMapper<T> {
         this.type = type;
     }
 
+    public static String encode(Throwable error) {
+        return Json.encode(error);
+    }
+
     private T body() {
         var body = request.getJsonObject("body");
 
@@ -35,7 +42,7 @@ public class JsonMapper<T> {
         }
 
         var pojo = body.mapTo(type);
-        var violations = validator.validate(pojo).toArray();
+        var violations = validator.validate(pojo).stream().map(this::violationDTO).toArray();
 
         if (violations.length > 0) {
             throw new InvalidInputException("Request body validation failed", violations);
@@ -45,6 +52,10 @@ public class JsonMapper<T> {
 
     }
 
+    private <T> Violation violationDTO(ConstraintViolation<T> violation) {
+        return new Violation(violation.getPropertyPath().toString(), violation.getMessage(), violation.getInvalidValue());
+    }
+
     public Optional<UUID> id(String paramName) {
         return Optional.ofNullable(request.getJsonObject("path"))
                        .flatMap(p -> Optional.ofNullable(p.getString(paramName)))
@@ -52,7 +63,7 @@ public class JsonMapper<T> {
     }
 
     public <R> R map(BiFunction<UUID, T, R> mapper) {
-        var uuid = id("uuid").orElseThrow(() -> new InvalidInputException(""));
+        var uuid = id("uuid").orElseThrow(() -> new InvalidInputException("sdgsdg"));
         return mapper.apply(uuid, body());
     }
 

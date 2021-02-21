@@ -6,5 +6,4 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Schema(description = "Phone number")
-public record PhoneNumber(@NotNull @NotBlank String phoneNumber) {
-}
+public record PhoneNumber(@NotNull @NotBlank String phoneNumber) {}
