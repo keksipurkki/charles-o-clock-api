@@ -23,11 +23,11 @@ class ClockStateRepository {
     }
 
     Future<ClockStatus> put(ClockStatus status) {
-        requireNonNull(status.getClient(), "Status with no associated client");
+        requireNonNull(status.client(), "Status with no associated client");
         var stack = db
-            .getOrDefault(status.getClient(), new ConcurrentLinkedDeque<>());
+            .getOrDefault(status.client(), new ConcurrentLinkedDeque<>());
         stack.addLast(status);
-        db.put(status.getClient(), stack);
+        db.put(status.client(), stack);
         return Future.succeededFuture(status);
     }
 

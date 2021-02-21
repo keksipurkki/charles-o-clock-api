@@ -9,6 +9,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.UUID;
 
@@ -60,14 +64,14 @@ class SmokeIT {
     @Test
     @DisplayName("Too long header value maps to 431 Request Header Fields Too Large")
     public void server_given_too_long_header_then_shortcircuit_to_431(VertxTestContext ctx) {
-        given()
-            .when()
-            .header("Accept", "A".repeat(10 * 1024))
-            .get("/")
-            .then()
-            .assertThat()
-            .log().all()
-            .statusCode(431);
+        given().when()
+               .header("Accept", "A".repeat(10 * 1024))
+               .get("/")
+               .then()
+               .assertThat()
+               .log()
+               .all()
+               .statusCode(431);
         ctx.completeNow();
     }
 
@@ -92,7 +96,7 @@ class SmokeIT {
     @Test
     @DisplayName("Malformed path parameter is a 400 Bad Request")
     public void server_given_malformed_uuid_then_bad_request(VertxTestContext ctx) {
-        var malicious = "A".repeat(256);
+        var malicious = "A".repeat(37);
         given()
             .log().parameters()
             .when().get(String.format("/clients/%s", malicious))
@@ -116,10 +120,11 @@ class SmokeIT {
         ctx.completeNow();
     }
 
-    @Test
-    @DisplayName("Request body is valid JSON but semantically invalid")
-    public void server_given_post_and_(VertxTestContext ctx) {
-        var phoneNumber = "A".repeat(12);
+    @ParameterizedTest
+    @DisplayName("Syntactically valid but semantically invalid JSON")
+    @NullSource
+    @ValueSource(strings = {"", " "})
+    public void server_given_post_semantically_invalid_json_then_400(String phoneNumber, VertxTestContext ctx) {
         var body = new JsonObject().put("phoneNumber", phoneNumber);
         given()
             .log().all()
@@ -130,13 +135,26 @@ class SmokeIT {
             .then()
             .log().all()
             .assertThat()
-            .statusCode(413).and().contentType(ContentType.JSON);
+            .statusCode(400).and().contentType(ContentType.JSON);
         ctx.completeNow();
     }
 
     @Test
-    public void server_given_malformed_json_then_400() {
-        fail();
+    @DisplayName("Syntactically invalid JSON")
+    public void server_given_post_malformed_json_then_400(VertxTestContext ctx) {
+        var body = "{ \"phoneNumber': \"AAAA\"}";
+        given()
+            .log().all()
+            .when()
+            .header("Content-Type", "application/json")
+            .body(body)
+            .post("/clients")
+            .then()
+            .log().all()
+            .assertThat()
+            .statusCode(400).and().contentType(ContentType.JSON);
+        ctx.completeNow();
+
     }
 
     @Test
@@ -153,10 +171,13 @@ class SmokeIT {
     @DisplayName("API requests are not cacheable")
     public void server_given_api_request_then_not_cached(VertxTestContext ctx) {
         given()
-            .when().get("/SOME_RANDOM_PATH")
+            .when()
+            .get("/SOME_RANDOM_PATH")
             .then()
-            .log().all()
-            .assertThat().header("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate");
+            .log()
+            .all()
+            .assertThat()
+            .header("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate");
         ctx.completeNow();
     }
 

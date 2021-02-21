@@ -46,7 +46,7 @@ class ClientRepository {
 
     Future<Client> put(Client client) {
         requireNonNull(client);
-        db.put(client.getId(), client);
+        db.put(client.id(), client);
         return Future.succeededFuture(client);
     }
 
@@ -60,7 +60,7 @@ class ClientRepository {
     }
 
     String clientId(PhoneNumber phone) {
-        var digest = hash.digest(phone.getPhoneNumber().getBytes(UTF_8));
+        var digest = hash.digest(phone.phoneNumber().getBytes(UTF_8));
         return new BigInteger(1, digest).toString(16);
     }
 

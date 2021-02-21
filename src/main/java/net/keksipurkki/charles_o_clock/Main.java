@@ -4,6 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.json.Json;
 import net.keksipurkki.charles_o_clock.audit.AuditVerticle;
 import net.keksipurkki.charles_o_clock.http.HttpVerticle;
 import org.slf4j.Logger;

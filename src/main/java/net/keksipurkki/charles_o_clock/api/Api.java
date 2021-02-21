@@ -11,6 +11,8 @@ import net.keksipurkki.charles_o_clock.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,6 +31,7 @@ public enum Api implements CharlesOClock {
     CLOCK;
 
     private static final Logger logger = LoggerFactory.getLogger(Api.class);
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Override
     public Future<Tag> createTag() {
@@ -47,8 +50,7 @@ public enum Api implements CharlesOClock {
             return ClientRepository.shared.put(client);
 
         }).map(client -> {
-                return new ClientCredentials(client.getId(), client.getKeypair()
-                                                                   .getPrivate());
+                return new ClientCredentials(client.id(), client.keyPair().getPrivate());
             }
         );
     }
@@ -61,18 +63,17 @@ public enum Api implements CharlesOClock {
 
     @Override
     public Future<Tag> claim(Client client, Tag tag) {
-        return TagRepository.shared.getById(tag.getId()).compose(existing -> {
+        return TagRepository.shared.getById(tag.id()).compose(existing -> {
 
             if (existing.isEmpty()) {
-                var message = String.format("No tag with id %s", tag.getId());
+                var message = String.format("No tag with id %s", tag.id());
                 throw new NotFoundException(message);
             }
 
             var target = existing.get();
 
-            if (nonNull(target.getClient())) {
-                var message = String.format("Tag %s already owned by client %s", tag
-                    .getId(), client.getId());
+            if (nonNull(target.client())) {
+                var message = String.format("Tag %s already owned by client %s", tag.id(), client.id());
                 throw new TagClaimException(message);
             }
 
@@ -83,19 +84,18 @@ public enum Api implements CharlesOClock {
 
     @Override
     public Future<Tag> disclaim(Client client, Tag tag) {
-        return TagRepository.shared.getById(tag.getId()).compose(existing -> {
+        return TagRepository.shared.getById(tag.id()).compose(existing -> {
 
             if (existing.isEmpty()) {
-                var message = String.format("No tag with id %s", tag.getId());
+                var message = String.format("No tag with id %s", tag.id());
                 throw new NotFoundException(message);
             }
 
             var target = existing.get();
 
-            if (isNull(target.getClient()) || !target.getClient()
+            if (isNull(target.client()) || !target.client()
                                                      .equals(client)) {
-                var message = String.format("Tag %s has not been claimed by client %s", tag
-                    .getId(), client.getId());
+                var message = String.format("Tag %s has not been claimed by client %s", tag.id(), client.id());
                 throw new TagClaimException(message);
             }
 
@@ -107,21 +107,19 @@ public enum Api implements CharlesOClock {
 
     @Override
     public Future<ClockStatus> clock(ClockStatus status) {
-        final var client = status.getClient();
+        final var client = status.client();
         return ClockStateRepository.shared.getLatest(client).compose(latest -> {
 
             if (latest.isEmpty()) {
-                if (status.getAction().equals(ClockStatus.Action.CLOCK_OUT)) {
+                if (status.action().equals(Action.CLOCK_OUT)) {
                     var message = String
                         .format("No existing clock state for client %s", client);
                     throw new ConflictingStateException(message);
                 }
             }
 
-            if (latest.isPresent() && latest.get().getAction()
-                                            .equals(status.getAction())) {
-                var message = String
-                    .format("Already in state %s", status.getAction());
+            if (latest.isPresent() && latest.get().action().equals(status.action())) {
+                var message = String.format("Already in state %s", status.action());
                 throw new ConflictingStateException(message);
             }
 
@@ -138,6 +136,7 @@ public enum Api implements CharlesOClock {
         final var body = Optional.ofNullable(params.body())
                                             .map(RequestParameter::getJsonObject)
                                             .orElseGet(JsonObject::new);
+
         var api = Api.valueOf(operation.getString("operationId"));
         var future = switch(api) {
             case CREATE_TAG -> api.createTag();

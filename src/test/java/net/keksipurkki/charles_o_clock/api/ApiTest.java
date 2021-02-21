@@ -7,13 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ApiTest {
 
-    @Test
-    public void phonenumber_given_falsey_inputs_then_illegal_arguments() {
-        assertThrows(IllegalArgumentException.class, () -> new PhoneNumber(null));
-        assertThrows(IllegalArgumentException.class, () -> new PhoneNumber(""));
-        assertThrows(IllegalArgumentException.class, () -> new PhoneNumber("  "));
-    }
-
  //   @Test
  //   public void register_given_some_phone_number_then_client_registers() {
  //       final var sut = Api.create();

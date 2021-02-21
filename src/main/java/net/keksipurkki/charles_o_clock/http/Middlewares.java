@@ -10,6 +10,8 @@ import net.keksipurkki.charles_o_clock.exception.UnsafeInputException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.nonNull;
+
 public class Middlewares {
 
     private static final Logger logger = LoggerFactory
@@ -44,14 +46,20 @@ public class Middlewares {
 
             logger.debug("Running error handler middleware");
 
+            if (nonNull(rc.failure())) {
+                logger.debug("Failure is {}", rc.failure().getClass().getName());
+            }
+
             // Request body is too big
             if (rc.statusCode() == 413) {
                 rc.fail(new UnsafeInputException("Input is unsafe to process", rc.statusCode()));
+                return;
             }
 
             // Exceptions thrown by Vert.x validation service
             if (rc.failure() instanceof BadRequestException) {
                 rc.fail(new InvalidInputException("Bad request", rc.failure()));
+                return;
             }
 
             rc.next();

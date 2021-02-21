@@ -108,7 +108,7 @@ components:
       properties:
         id:
           type: string
-        keypair:
+        keyPair:
           type: object
           properties:
             public:
@@ -174,24 +174,8 @@ components:
       properties:
         id:
           type: string
-        secret:
-          type: object
-          properties:
-            encoded:
-              type: array
-              items:
-                type: string
-                format: byte
-            format:
-              type: string
-            algorithm:
-              type: string
-            destroyed:
-              type: boolean
       description: Client credentials
     PhoneNumber:
-      required:
-      - phoneNumber
       type: object
       properties:
         phoneNumber:

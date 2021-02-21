@@ -31,14 +31,14 @@ class TagRepository {
     }
 
     Future<Tag> claim(Client client, Tag tag) {
-        var claimed = new Tag(tag.getId(), client);
-        db.put(tag.getId(), claimed);
+        var claimed = new Tag(tag.id(), client);
+        db.put(tag.id(), claimed);
         return Future.succeededFuture(claimed);
     }
 
     Future<Tag> disclaim(Client client, Tag tag) {
-        var disclaimed = new Tag(tag.getId(), null);
-        db.put(tag.getId(), disclaimed);
+        var disclaimed = new Tag(tag.id(), null);
+        db.put(tag.id(), disclaimed);
         return Future.succeededFuture(disclaimed);
     }
 }
