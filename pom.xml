@@ -246,7 +246,7 @@
                         <package>net.keksipurkki.charles_o_clock.domain</package>
                         <package>net.keksipurkki.charles_o_clock.exception</package>
                     </resourcePackages>
-                    <modelConverterClasses>net.keksipurkki.charles_o_clock.support.FutureValueConverter</modelConverterClasses>
+                    <modelConverterClasses>net.keksipurkki.charles_o_clock.api.FutureValueSupport</modelConverterClasses>
                     <prettyPrint>true</prettyPrint>
                 </configuration>
                 <executions>

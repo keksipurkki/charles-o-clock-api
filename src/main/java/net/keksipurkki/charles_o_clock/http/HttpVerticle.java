@@ -70,7 +70,7 @@ public class HttpVerticle extends AbstractVerticle {
         var path = operation.getOpenAPIPath();
         logger.debug("Mounting {} ({})", operationId, path);
         return builder.operation(operationId)
-                      .handler(Api::handle)
+                      .handler(Api.create(operationId))
                       .failureHandler(Middlewares.errorHandler());
     }
 

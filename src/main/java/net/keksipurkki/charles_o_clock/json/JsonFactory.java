@@ -1,12 +1,14 @@
-package net.keksipurkki.charles_o_clock.support;
+package net.keksipurkki.charles_o_clock.json;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.EncodeException;
 import io.vertx.core.spi.json.JsonCodec;
+import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@MetaInfServices
 public class JsonFactory implements io.vertx.core.spi.JsonFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonFactory.class);
@@ -14,14 +16,16 @@ public class JsonFactory implements io.vertx.core.spi.JsonFactory {
     @Override
     public JsonCodec codec() {
         logger.debug("Loading custom JSON codec implementation");
-        return new CustomDatabindCodec();
+        // TODO: Replace with custom implementation
+        return new io.vertx.core.json.jackson.DatabindCodec();
     }
 
     int order() {
         return 0;
     }
 
-    private static class CustomDatabindCodec implements JsonCodec {
+    // TODO: User JsonMapper
+    private static class DatabindCodec implements JsonCodec {
 
         @Override
         public <T> T fromString(String s, Class<T> aClass) throws DecodeException {

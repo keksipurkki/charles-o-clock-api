@@ -4,8 +4,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.json.Json;
-import net.keksipurkki.charles_o_clock.audit.AuditVerticle;
 import net.keksipurkki.charles_o_clock.http.HttpVerticle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +21,9 @@ public class Main {
 
         var vertx = Vertx.vertx(opts);
         var httpVerticle = new HttpVerticle();
-        var auditVerticle = new AuditVerticle();
 
         Future.succeededFuture()
               .compose(v -> deploy(vertx, httpVerticle))
-              .compose(v -> deploy(vertx, auditVerticle))
               .onComplete(deployment -> {
 
                 if (deployment.failed()) {
